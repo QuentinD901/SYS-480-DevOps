@@ -120,8 +120,8 @@ finalCheck
 }
 
 # Prints all VMs one last time
-
-testConnect
 function finalCheck() {
 Get-VM
 }
+
+testConnect
