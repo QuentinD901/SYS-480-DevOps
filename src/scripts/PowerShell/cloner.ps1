@@ -29,7 +29,7 @@ $linkedVM = New-VM -LinkedClone -Name $linkedClone -VM $vm -ReferenceSnapshot $s
 $netInput = Read-Host -Prompt "Enter the Network Adapter you want to assign: "
 
 # Assigns Network Adapter
-$net = $linkedVM | Get-NetworkAdapter | Set-NetworkAdpater -NetworkName $netInput
+$net = $linkedVM | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $netInput
 
 # Prompts user for New VM to name
 $nvmInput = Read-Host -Prompt "Enter a name for your New Clone: "
