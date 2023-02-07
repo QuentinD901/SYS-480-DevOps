@@ -25,7 +25,7 @@ loginToVCenter
 function loginToVCenter() {
 $vcServer = "vcenter.quentin.local"
 $vcUsr = "q-adm@quentin.local"
-$vcPwd = "BabaBooey1"
+$vcPwd = "********"
 Connect-VIServer -Server $vcServer -User $vcUsr -Password $vcPwd | Out-Null
 Write-Host ""
 # Get all the virtual machines
