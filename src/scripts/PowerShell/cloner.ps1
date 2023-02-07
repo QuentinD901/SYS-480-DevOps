@@ -1,12 +1,12 @@
 # Get all the virtual machines
-$vms = Get-VM
+#$vms = Get-VM
 
 # Store the virtual machine names and numbers in a dictionary for easier lookup
-$vmdict = @{}
-for ($i=0; $i -lt $vms.Count; $i++) {
-    $vmdict[$i+1] = $vms[$i].Name
-    $vmdict[$vms[$i].Name] = $i+1
-}
+#$vmdict = @{}
+#for ($i=0; $i -lt $vms.Count; $i++) {
+#    $vmdict[$i+1] = $vms[$i].Name
+#    $vmdict[$vms[$i].Name] = $i+1
+#}
 
 # Test vCenter Connection
 function testConnect() {
@@ -27,6 +27,18 @@ $vcServer = "vcenter.quentin.local"
 $vcUsr = "q-adm@quentin.local"
 $vcPwd = "BabaBooey1"
 Connect-VIServer -Server $vcServer -User $vcUsr -Password $vcPwd | Out-Null
+Write-Host ""
+# Get all the virtual machines
+$vms = Get-VM
+
+# Store the virtual machine names and numbers in a dictionary for easier lookup
+$vmdict = @{}
+for ($i=0; $i -lt $vms.Count; $i++) {
+    $vmdict[$i+1] = $vms[$i].Name
+    $vmdict[$vms[$i].Name] = $i+1
+}
+
+
 Write-Host ""
 listVMsToClone
 }
@@ -91,15 +103,18 @@ function createLinkedClone() {
   $snapshot = Get-Snapshot -VM $vm -Name "Base"
   $linkedClone = "{0}.linked" -f $vm.Name
   $linkedVM = New-VM -LinkedClone -Name $linkedClone -VM $vm -ReferenceSnapshot $snapshot -VMHost $vmhost -Datastore $ds
-  assignNetworkAdapter
+  $netInput = Read-Host -Prompt "Enter the Network Adapter you want to assign"
+  $net = $linkedVM | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $netInput
+  nameNewVM
 }
 
 # Assign Network Adapter
-function assignNetworkAdapter() {
-$netInput = Read-Host -Prompt "Enter the Network Adapter you want to assign"
-$net = $linkedVM | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $netInput
-nameNewVM
-}
+#function assignNetworkAdapter() {
+#$netInput = Read-Host -Prompt "Enter the Network Adapter you want to assign"
+#$net = $linkedVM | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $netInput
+#nameNewVM
+#}
+
 # Assign New VM name
 function nameNewVM() {
 $nvmInput = Read-Host -Prompt "Enter the name of the new VM"
@@ -115,7 +130,7 @@ cleanUp
 
 # Clean Up linked VM
 function cleanUp() {
-$linkedVM | Remove-VM
+$linkedVM | Remove-VM -DeletePermanently
 finalCheck
 }
 
