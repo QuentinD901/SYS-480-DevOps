@@ -1,0 +1,7 @@
+{
+    "vcenter_server" : "vcenter.quentin.local",
+    "esxi_host" : "192.168.7.39",
+    "folder" : "BASE-VM",
+    "default_network" : "480-WAN",
+    "default_datastore" : "datastore1-super29"
+}
