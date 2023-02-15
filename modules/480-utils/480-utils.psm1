@@ -88,7 +88,7 @@ function cloneMenu() {
         Clear-Host
         intMenu
     }elseif($menuInput -eq '1'){
-        linkedClone
+        linkedClone1
     }elseif($menuInput -eq '2'){
         baseClone
     }elseif($menuInput -eq '3'){
@@ -193,6 +193,53 @@ function fullClone() {
         }
 }
 
+
+# Used to create linked Clones - Will list ALL VMs
+function linkedClone1() {
+    $config = (Get-Content -Raw -Path "/home/q/Documents/techJournal/SYS-480-DevOps/480.json" | ConvertFrom-Json)
+    Clear-Host
+    Write-Host "Options"
+    Write-Host "[0] Main Menu"
+    $selectedVM = $null
+        $vms = Get-VM #-Location $config.folder
+        $index = 1
+        foreach($vm in $vms) {
+            Write-Host  "[$index] $($vm.name)"
+            $index+=1
+        }
+        Write-Host ""
+        $vmInput = Read-Host 'Which index number [x] do you wish to use to create a Linked Clone?'
+        # could make check a function
+        if ($vmInput -match '^\d+$') {
+            $key = [int]$vmInput - 1
+            if ($key -lt 0) {
+                Clear-Host
+                intMenu
+            }elseif($key -ge $vms.Count){
+                Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID to create a Full Clone"
+                Start-Sleep -Seconds 1.5
+                linkedClone1 #-folder $config.folder
+            }else {
+                $selectedVM = $vms[$key]
+                Write-Host ""
+                Write-Host "You picked $($selectedVM.name)."
+                $confirm = Read-Host -Prompt "Are you sure you want to clone the selected virtual machine (Y/N)? "
+                if ($confirm -eq "Y" -or $confirm -eq "y" -or $confirm -eq "yes"-or $confirm -eq "Yes") {
+                    Clear-Host
+                    linkedClone $selectedVM
+                } else {
+                  Clear-Host
+                  Write-Host "Cloning cancelled. Please select a valid Index ID to create a Full Clone"
+                  linkedClone1 #-folder $config.folder
+                }
+            }
+        }else{
+            Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID to create a Full Clone"
+            Start-Sleep -Seconds 1.5
+            fullClone
+        }
+}
+
 # Creates linked Clones 
 function createLinkedClone($selectedVM) {
     $config = (Get-Content -Raw -Path "/home/q/Documents/techJournal/SYS-480-DevOps/480.json" | ConvertFrom-Json)
@@ -212,7 +259,9 @@ function linkedClone($selectedVM) {
     $linkedClone = "{0}.linked" -f $selectedVM.Name
     $linkedVM = New-VM -LinkedClone -Name $linkedClone -VM $selectedVM.Name -ReferenceSnapshot $snapshot -VMHost $config.esxi_host -Datastore $config.default_datastore 
     $linkedVM | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $config.default_network -Confirm:$false
+    Write-Host ""
     Write-Host "$linkedVM has been created"
+}
 
 # Uses linkedVM to create a new VM  
 function newVM($linkedVM) {
@@ -350,3 +399,49 @@ function selectVM() {
         }
 }
 #>
+
+# Used to create linked Clones - Will list ALL VMs
+function linkedClone1() {
+    $config = (Get-Content -Raw -Path "/home/q/Documents/techJournal/SYS-480-DevOps/480.json" | ConvertFrom-Json)
+    Clear-Host
+    Write-Host "Options"
+    Write-Host "[0] Main Menu"
+    $selectedVM = $null
+        $vms = Get-VM #-Location $config.folder
+        $index = 1
+        foreach($vm in $vms) {
+            Write-Host  "[$index] $($vm.name)"
+            $index+=1
+        }
+        Write-Host ""
+        $vmInput = Read-Host 'Which index number [x] do you wish to use to create a Linked Clone?'
+        # could make check a function
+        if ($vmInput -match '^\d+$') {
+            $key = [int]$vmInput - 1
+            if ($key -lt 0) {
+                Clear-Host
+                intMenu
+            }elseif($key -ge $vms.Count){
+                Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID to create a Full Clone"
+                Start-Sleep -Seconds 1.5
+                linkedClone1 #-folder $config.folder
+            }else {
+                $selectedVM = $vms[$key]
+                Write-Host ""
+                Write-Host "You picked $($selectedVM.name)."
+                $confirm = Read-Host -Prompt "Are you sure you want to clone the selected virtual machine (Y/N)? "
+                if ($confirm -eq "Y" -or $confirm -eq "y" -or $confirm -eq "yes"-or $confirm -eq "Yes") {
+                    Clear-Host
+                    linkedClone $selectedVM
+                } else {
+                  Clear-Host
+                  Write-Host "Cloning cancelled. Please select a valid Index ID to create a Full Clone"
+                  linkedClone1 #-folder $config.folder
+                }
+            }
+        }else{
+            Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID to create a Full Clone"
+            Start-Sleep -Seconds 1.5
+            fullClone
+        }
+}
