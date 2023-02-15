@@ -5,7 +5,6 @@ Author: Quentin DeGiorgio
 TODO:
 - Make baseClone() add clones to BASE-VM folder 
 - Have fullClone() add clones to DEV folder
-- Consult with Devin about further enchancements 
 #>
 
 function 480Banner() {
@@ -80,16 +79,19 @@ function cloneMenu() {
     Clear-Host 
     Write-Host "Options"
     Write-Host "[0] Main Menu"
-    Write-Host "[1] Base Clone (Base Snpshot Required)" 
-    Write-Host "[2] Full Clone (Base Clone Required)"
+    Write-Host "[1] Linked Clone"
+    Write-Host "[2] Base Clone (Base Snpshot Required)" 
+    Write-Host "[3] Full Clone (Base Clone Required)"
     Write-Host ""
     $menuInput = Read-Host 'Which index number [x] do you wish to pick?'
     if ($menuInput -eq "0"){
         Clear-Host
         intMenu
     }elseif($menuInput -eq '1'){
-        baseClone
+        linkedClone
     }elseif($menuInput -eq '2'){
+        baseClone
+    }elseif($menuInput -eq '3'){
         fullClone
     }else{
         Write-Host -ForegroundColor "Red" "Invalid Option. Please Select a valid index number [x]."
@@ -202,6 +204,15 @@ function createLinkedClone($selectedVM) {
     Write-Host $selectedVM
     newVM $linkedVM
   }
+
+# Creates linked Clone - does not get deleted
+function linkedClone($selectedVM) {
+    $config = (Get-Content -Raw -Path "/home/q/Documents/techJournal/SYS-480-DevOps/480.json" | ConvertFrom-Json)
+    $snapshot = Get-Snapshot -VM $selectedVM.Name -Name "Base" 
+    $linkedClone = "{0}.linked" -f $selectedVM.Name
+    $linkedVM = New-VM -LinkedClone -Name $linkedClone -VM $selectedVM.Name -ReferenceSnapshot $snapshot -VMHost $config.esxi_host -Datastore $config.default_datastore 
+    $linkedVM | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $config.default_network -Confirm:$false
+    Write-Host "$linkedVM has been created"
 
 # Uses linkedVM to create a new VM  
 function newVM($linkedVM) {
