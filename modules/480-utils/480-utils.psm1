@@ -595,6 +595,44 @@ function delVPort(){
 
 }
 
+function vmNetworking() {
+    $selectedVM = $null
+        $vms = Get-VM #-Location $config.folder
+        $index = 1
+        Write-Host "[0] Go Back"
+        foreach($vm in $vms) {
+            Write-Host  "[$index] $($vm.name)"
+            $index+=1
+        }
+        Write-Host ""
+        $vmInput = Read-Host "Which index number [x] do you wish to use to retireve the VM's network information?"
+        if ($vmInput -match '^\d+$') {
+            $key = [int]$vmInput - 1
+            if ($key -lt 0) {
+                Clear-Host
+                vmMenu
+            }elseif($key -ge $vms.Count){
+                Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID to create a Full Clone"
+                Start-Sleep -Seconds 1.5
+                vmNetworking
+            }else {
+                $selectedVM = $vms[$key]
+                $net2 = Get-VM -name $selectedVM | Select Name, @{N="IP Address";E={@($_.guest.IPAddress[0])}}
+                $net = Get-VM -name $selectedVM | Get-NetworkAdapter
+                Write-Host ""
+                Write-Host "VM Name: "$net2.Name
+                Write-Host "Network: "$net.NetworkName
+                Write-Host "IP Address: "$net2.'IP Address'
+                Write-Host "Mac Address: "$net.MacAddress
+                Write-Host ""
+                finishCheck
+            }
+        }else{
+            Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID"
+            Start-Sleep -Seconds 1.5
+            vmNetworking
+        }
+}
 
 <# Not Needed was used to create individual functions for different use-cases.
 function selectVM() {
@@ -688,43 +726,3 @@ function linkedClone1() {
         }
 }
 #>
-
-
-function vmNetworking() {
-    $selectedVM = $null
-        $vms = Get-VM #-Location $config.folder
-        $index = 1
-        Write-Host "[0] Go Back"
-        foreach($vm in $vms) {
-            Write-Host  "[$index] $($vm.name)"
-            $index+=1
-        }
-        Write-Host ""
-        $vmInput = Read-Host "Which index number [x] do you wish to use to retireve the VM's network information?"
-        if ($vmInput -match '^\d+$') {
-            $key = [int]$vmInput - 1
-            if ($key -lt 0) {
-                Clear-Host
-                vmMenu
-            }elseif($key -ge $vms.Count){
-                Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID to create a Full Clone"
-                Start-Sleep -Seconds 1.5
-                vmNetworking
-            }else {
-                $selectedVM = $vms[$key]
-                $net2 = Get-VM -name $selectedVM | Select Name, @{N="IP Address";E={@($_.guest.IPAddress[0])}}
-                $net = Get-VM -name $selectedVM | Get-NetworkAdapter
-                Write-Host ""
-                Write-Host "VM Name: "$net2.Name
-                Write-Host "Network: "$net.NetworkName
-                Write-Host "IP Address: "$net2.'IP Address'
-                Write-Host "Mac Address: "$net.MacAddress
-                Write-Host ""
-                finishCheck
-            }
-        }else{
-            Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID"
-            Start-Sleep -Seconds 1.5
-            vmNetworking
-        }
-}
