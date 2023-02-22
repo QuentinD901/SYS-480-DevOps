@@ -53,6 +53,7 @@ function vmMenu([string[]] $folder) {
     Write-Host "[2] Delete VM"
     Write-Host "[3] Retreive VM Networking"
     Write-Host "[4] Power Options"
+    Write-Host "[5] Edit a VM"
     Write-Host ""
     $menuInput = Read-Host 'Which index number [x] do you wish to pick?'
     if ($menuInput -eq "1"){
@@ -68,6 +69,9 @@ function vmMenu([string[]] $folder) {
     }elseif($menuInput -eq '4'){
         Clear-Host
         powerMenu
+    }elseif($menuInput -eq '5'){
+        Clear-Host
+        editMenu
     }else{
         Write-Host -ForegroundColor "Red" "Invalid Option. Please Select a valid index number [x]."
         Start-Sleep -Seconds 1.5
@@ -144,6 +148,53 @@ function powerMenu() {
     }
 }
 
+# Menu options for clones + Selection
+function cloneMenu() {
+    Clear-Host 
+    Write-Host "Options"
+    Write-Host "[0] Main Menu"
+    Write-Host "[1] Linked Clone"
+    Write-Host "[2] Base Clone (Base Snpshot Required)" 
+    Write-Host "[3] Full Clone (Base Clone Required)"
+    Write-Host ""
+    $menuInput = Read-Host 'Which index number [x] do you wish to pick?'
+    if ($menuInput -eq "0"){
+        Clear-Host
+        intMenu
+    }elseif($menuInput -eq '1'){
+        linkedClone1
+    }elseif($menuInput -eq '2'){
+        baseClone
+    }elseif($menuInput -eq '3'){
+        fullClone
+    }else{
+        Write-Host -ForegroundColor "Red" "Invalid Option. Please Select a valid index number [x]."
+        Start-Sleep -Seconds 1.5
+        Clear-Host
+        cloneMenu
+    }
+}
+
+function editMenu() {
+    listVM
+    if ($key -lt 0) {
+        Clear-Host
+        vmMenu
+    }else{$null}
+    if($selectedVM -ne $null){
+        Clear-Host 
+        Write-Host "Edit Options"
+        Write-Host "[0] Go Back"
+        Write-Host "[1] Change Network Adapter"
+        $userInput = Read-Host "Which index number [x] do you wish to use?"
+        if($userInput -eq '0'){
+            editMenu
+        }elseif($userInput -eq '1'){
+            changeNetworkAdapter
+        }else{editMenu}
+    }
+}
+
 # Connect to vCenter
 function 480Connect() {
     $config_path= "/home/q/Documents/techJournal/SYS-480-DevOps/480.json"
@@ -174,33 +225,6 @@ function get480Config() {
     return $conf
 }
 
-# Menu options for clones + Selection
-function cloneMenu() {
-    Clear-Host 
-    Write-Host "Options"
-    Write-Host "[0] Main Menu"
-    Write-Host "[1] Linked Clone"
-    Write-Host "[2] Base Clone (Base Snpshot Required)" 
-    Write-Host "[3] Full Clone (Base Clone Required)"
-    Write-Host ""
-    $menuInput = Read-Host 'Which index number [x] do you wish to pick?'
-    if ($menuInput -eq "0"){
-        Clear-Host
-        intMenu
-    }elseif($menuInput -eq '1'){
-        linkedClone1
-    }elseif($menuInput -eq '2'){
-        baseClone
-    }elseif($menuInput -eq '3'){
-        fullClone
-    }else{
-        Write-Host -ForegroundColor "Red" "Invalid Option. Please Select a valid index number [x]."
-        Start-Sleep -Seconds 1.5
-        Clear-Host
-        cloneMenu
-    }
-}
-
 # Used to create Base Clones - Will list ALL VMs excluding BASE-VM Folder
 function baseClone() {
     #$config = (Get-Content -Raw -Path "/home/q/Documents/techJournal/SYS-480-DevOps/480.json" | ConvertFrom-Json)
@@ -221,7 +245,6 @@ function baseClone() {
             $key = [int]$vmInput - 1
             if ($key -lt 0) {
                 Clear-Host
-                intMenu
             }elseif($key -ge $vms.Count){
                 Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID to create a Base Clone"
                 Start-Sleep -Seconds 1.5
@@ -339,7 +362,7 @@ function linkedClone1() {
         }
 }
 
-# Creates linked Clones 
+# Creates linked Clones - gets deleted
 function createLinkedClone($selectedVM) {
     $config = (Get-Content -Raw -Path "/home/q/Documents/techJournal/SYS-480-DevOps/480.json" | ConvertFrom-Json)
     $snapshot = Get-Snapshot -VM $selectedVM.Name -Name "Base" 
@@ -354,12 +377,14 @@ function createLinkedClone($selectedVM) {
 # Creates linked Clone - does not get deleted
 function linkedClone($selectedVM) {
     $config = (Get-Content -Raw -Path "/home/q/Documents/techJournal/SYS-480-DevOps/480.json" | ConvertFrom-Json)
-    $snapshot = Get-Snapshot -VM $selectedVM.Name -Name "Base" 
-    $linkedClone = "{0}.linked" -f $selectedVM.Name
+    $snapshot = Get-Snapshot -VM $selectedVM.Name -Name "Base"
+    $inputName = Read-Host "Enter a name for the linked VM" 
+    $linkedClone = $inputName -f $selectedVM.Name
     $linkedVM = New-VM -LinkedClone -Name $linkedClone -VM $selectedVM.Name -ReferenceSnapshot $snapshot -VMHost $config.esxi_host -Datastore $config.default_datastore 
     $linkedVM | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $config.default_network -Confirm:$false
     Write-Host ""
     Write-Host "$linkedVM has been created"
+    finishCheck
 }
 
 # Uses linkedVM to create a new VM  
@@ -660,18 +685,33 @@ function vmNetworking() {
         }
 }
 
+# TEST TEST TEST
 function listVM() {
     $selectedVM = $null
         $vms = Get-VM #-Location $config.folder
         $index = 1
-        Write-Host "[0] Main Menu"
+        Write-Host "[0] Go Back"
         foreach($vm in $vms) {
             Write-Host  "[$index] $($vm.name)"
             $index+=1
         }
         Write-Host ""
-        #$vmInput = Read-Host "Which index number [x] do you wish to use?"
+        $vmInput = Read-Host "Which index number [x] do you wish to use?"
+        if ($vmInput -match '^\d+$') {
+            $key = [int]$vmInput - 1
+            if ($key -lt 0) {
+                $null
+         }elseif($key -ge $vms.Count){
+                Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID"
+                Start-Sleep -Seconds 1.5
+                powerVM
+         }else {
+            $selectedVM = $vms[$key]
+         }
+
 }
+}
+
 
 function powerVM($menuInput) {
     $selectedVM = $null
@@ -755,53 +795,6 @@ function selectVM() {
             Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID"
             Start-Sleep -Seconds 1.5
             selectVM
-        }
-}
-
-
-# Used to create linked Clones - Will list ALL VMs
-function linkedClone1() {
-    $config = (Get-Content -Raw -Path "/home/q/Documents/techJournal/SYS-480-DevOps/480.json" | ConvertFrom-Json)
-    Clear-Host
-    Write-Host "Options"
-    Write-Host "[0] Main Menu"
-    $selectedVM = $null
-        $vms = Get-VM #-Location $config.folder
-        $index = 1
-        foreach($vm in $vms) {
-            Write-Host  "[$index] $($vm.name)"
-            $index+=1
-        }
-        Write-Host ""
-        $vmInput = Read-Host 'Which index number [x] do you wish to use to create a Linked Clone?'
-        # could make check a function
-        if ($vmInput -match '^\d+$') {
-            $key = [int]$vmInput - 1
-            if ($key -lt 0) {
-                Clear-Host
-                intMenu
-            }elseif($key -ge $vms.Count){
-                Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID to create a Full Clone"
-                Start-Sleep -Seconds 1.5
-                linkedClone1 #-folder $config.folder
-            }else {
-                $selectedVM = $vms[$key]
-                Write-Host ""
-                Write-Host "You picked $($selectedVM.name)."
-                $confirm = Read-Host -Prompt "Are you sure you want to clone the selected virtual machine (Y/N)? "
-                if ($confirm -eq "Y" -or $confirm -eq "y" -or $confirm -eq "yes"-or $confirm -eq "Yes") {
-                    Clear-Host
-                    linkedClone $selectedVM
-                } else {
-                  Clear-Host
-                  Write-Host "Cloning cancelled. Please select a valid Index ID to create a Full Clone"
-                  linkedClone1 #-folder $config.folder
-                }
-            }
-        }else{
-            Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID to create a Full Clone"
-            Start-Sleep -Seconds 1.5
-            fullClone
         }
 }
 #>
