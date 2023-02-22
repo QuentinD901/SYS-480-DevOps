@@ -175,12 +175,13 @@ function cloneMenu() {
     }
 }
 
-function editMenu() {
-    listVM
-    if ($key -lt 0) {
+function editMenu($selectedVM) {
+    $selectedVM = listVM
+    if ($selectedVM -lt 0) {
         Clear-Host
         vmMenu
     }else{$null}
+    # Add a try/catach to below if - to catach the compare error
     if($selectedVM -ne $null){
         Clear-Host 
         Write-Host "Edit Options"
@@ -188,9 +189,11 @@ function editMenu() {
         Write-Host "[1] Change Network Adapter"
         $userInput = Read-Host "Which index number [x] do you wish to use?"
         if($userInput -eq '0'){
+            Clear-Host
             editMenu
         }elseif($userInput -eq '1'){
-            changeNetworkAdapter
+            Clear-Host
+            changeNetworkAdapter $selectedVM
         }else{editMenu}
     }
 }
@@ -496,7 +499,7 @@ function newVSwitch(){
 
 # Creates New Virtual Portgroup
 function newVPort($vSwitch){
-    $config = (Get-Content -Raw -Path "/home/q/Documents/techJournal/SYS-480-DevOps/480.json" | ConvertFrom-Json)
+    #$config = (Get-Content -Raw -Path "/home/q/Documents/techJournal/SYS-480-DevOps/480.json" | ConvertFrom-Json)
     Write-Host ""
     $readPort = Read-Host "Provide a name for the new Portgroup"
     if ($vSwitch -ne $null){
@@ -685,7 +688,7 @@ function vmNetworking() {
         }
 }
 
-# TEST TEST TEST
+# Used to list VMs - Helper fucntion - TEST TEST TEST
 function listVM() {
     $selectedVM = $null
         $vms = Get-VM #-Location $config.folder
@@ -704,12 +707,14 @@ function listVM() {
          }elseif($key -ge $vms.Count){
                 Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID"
                 Start-Sleep -Seconds 1.5
-                powerVM
+                listVM
          }else {
             $selectedVM = $vms[$key]
+            return $selectedVM
          }
-
-}
+         #return $selectedVM
+    }
+    return $selectedVM
 }
 
 
@@ -751,6 +756,27 @@ function powerVM($menuInput) {
         finishCheck
     }
     }
+}
+
+function changeNetworkAdapter($selectedVM) {
+    Write-Host "Available Network Adapters"
+    Write-Host "[0] Go Back"
+    Write-Host "[1] VM Network"
+    Write-Host "[2] 480-WAN"
+    Write-Host ""
+    $userInput = Read-Host "Which index number [x] do you wish to use?"
+        if($userInput -eq '0'){
+            editMenu
+        }elseif($userInput -eq '1'){
+            Clear-Host
+            Get-VM $selectedVM | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName "VM Network"
+            finishCheck
+        }elseif($userInput -eq '2'){
+            Clear-Host
+            Get-VM $selectedVM | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName "480-WAN"
+            finishCheck
+        }else{changeNetworkAdapter}
+
 }
 
 <# Not Needed was used to create individual functions for different use-cases.
