@@ -52,6 +52,7 @@ function vmMenu([string[]] $folder) {
     Write-Host "[1] Create Clone" 
     Write-Host "[2] Delete VM"
     Write-Host "[3] Retreive VM Networking"
+    Write-Host "[4] Power Options"
     Write-Host ""
     $menuInput = Read-Host 'Which index number [x] do you wish to pick?'
     if ($menuInput -eq "1"){
@@ -64,6 +65,9 @@ function vmMenu([string[]] $folder) {
     }elseif($menuInput -eq '3'){
         Clear-Host
         vmNetworking
+    }elseif($menuInput -eq '4'){
+        Clear-Host
+        powerMenu
     }else{
         Write-Host -ForegroundColor "Red" "Invalid Option. Please Select a valid index number [x]."
         Start-Sleep -Seconds 1.5
@@ -115,6 +119,28 @@ function networkMenu(){
         Start-Sleep -Seconds 1.5
         Clear-Host
         networkMenu
+    }
+}
+
+function powerMenu() {
+    Write-Host "Select Option"
+    Write-Host "[0] Go Back"
+    Write-Host "[1] Start VM" 
+    Write-Host "[2] Shutdown VM"
+    Write-Host "[3] Restart VM"
+    Write-Host "[4] Force Stop VM"
+    Write-Host ""
+    $menuInput = Read-Host 'Which index number [x] do you wish to pick?'
+    if($menuInput -eq "0"){
+        Clear-Host
+        intMenu
+    }elseif($menuInput -eq '1' -or $menuInput-eq '2' -or $menuInput -eq '3' -or $menuInput -eq '4'){
+        powerVM $menuInput
+    }else{
+        Write-Host -ForegroundColor "Red" "Invalid Option. Please Select a valid index number [x]."
+        Start-Sleep -Seconds 1.5
+        Clear-Host
+        powerMenu
     }
 }
 
@@ -633,6 +659,76 @@ function vmNetworking() {
             vmNetworking
         }
 }
+
+function listVM() {
+    $selectedVM = $null
+        $vms = Get-VM #-Location $config.folder
+        $index = 1
+        Write-Host "[0] Main Menu"
+        foreach($vm in $vms) {
+            Write-Host  "[$index] $($vm.name)"
+            $index+=1
+        }
+        Write-Host ""
+        #$vmInput = Read-Host "Which index number [x] do you wish to use?"
+}
+
+function powerVM($menuInput) {
+    $selectedVM = $null
+    $vms = Get-VM #-Location $config.folder
+    $index = 1
+    Write-Host "[0] Main Menu"
+    foreach($vm in $vms) {
+        Write-Host  "[$index] $($vm.name)"
+        $index+=1
+    }
+    Write-Host ""
+    $vmInput = Read-Host "Which index number [x] do you wish to use?"
+    if ($vmInput -match '^\d+$') {
+        $key = [int]$vmInput - 1
+        if ($key -lt 0) {
+            Clear-Host
+            intMenu
+     }elseif($key -ge $vms.Count){
+            Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID"
+            Start-Sleep -Seconds 1.5
+            powerVM
+     }else {
+        $selectedVM = $vms[$key]
+        if($menuInput -eq '1'){
+            Start-VM -VM $selectedVM -Confirm:$false
+        }elseif($menuInput -eq '2'){
+            Shutdown-VMGuest -VM $selectedVM -Confirm:$false
+        }elseif($menuInput -eq '3'){
+            Restart-VM -VM $selectedVM -Confirm:$false
+        }elseif($menuInput -eq '4'){
+            Stop-VM -VM $selectedVM -Confirm:$false
+        }else{
+            Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID"
+            Start-Sleep -Seconds 1.5
+            powerVM
+        }
+        finishCheck
+    }
+    }
+}
+
+<# 
+        
+     }elseif($menuInput -eq '3'){
+            Restart-VM -VM $vmInput
+      }elseif($menuInput -eq '4'){
+         Stop-VM -VM $vmInput
+     }elseif($menuInput -eq '0'){
+         Clear-Host
+          intMenu
+     }else{
+        Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID"
+        Start-Sleep -Seconds 1.5
+        powerVM
+     }
+
+
 
 <# Not Needed was used to create individual functions for different use-cases.
 function selectVM() {
