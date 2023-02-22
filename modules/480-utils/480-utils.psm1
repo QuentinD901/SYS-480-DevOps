@@ -5,6 +5,9 @@ Author: Quentin DeGiorgio
 TODO:
 - Make baseClone() add clones to BASE-VM folder 
 - Have fullClone() add clones to DEV folder
+- Add a try/catch to the editVM function to catach comparison errror 
+- When listing power options - list only VMs that would not return an error (ex. if awx is off it should not show up when I select shutdown and vice versa)
+- Create options to specify which network adapter should be modified when changing network adapters
 #>
 
 function 480Banner() {
