@@ -766,6 +766,7 @@ function changeNetworkAdapter($selectedVM) {
     Write-Host "[0] Go Back"
     Write-Host "[1] VM Network"
     Write-Host "[2] 480-WAN"
+    Write-Host "[3] Blue-LAN"
     Write-Host ""
     $userInput = Read-Host "Which index number [x] do you wish to use?"
         if($userInput -eq '0'){
@@ -777,6 +778,10 @@ function changeNetworkAdapter($selectedVM) {
         }elseif($userInput -eq '2'){
             Clear-Host
             Get-VM $selectedVM | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName "480-WAN"
+            finishCheck
+        }elseif($userInput -eq '3'){
+            Clear-Host
+            Get-VM $selectedVM | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName "Blue-LAN"
             finishCheck
         }else{changeNetworkAdapter}
 
