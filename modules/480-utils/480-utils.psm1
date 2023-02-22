@@ -713,23 +713,6 @@ function powerVM($menuInput) {
     }
 }
 
-<# 
-        
-     }elseif($menuInput -eq '3'){
-            Restart-VM -VM $vmInput
-      }elseif($menuInput -eq '4'){
-         Stop-VM -VM $vmInput
-     }elseif($menuInput -eq '0'){
-         Clear-Host
-          intMenu
-     }else{
-        Write-Host -ForegroundColor "Red" "Invalid Index ID. Please select a valid Index ID"
-        Start-Sleep -Seconds 1.5
-        powerVM
-     }
-
-
-
 <# Not Needed was used to create individual functions for different use-cases.
 function selectVM() {
     Clear-Host
