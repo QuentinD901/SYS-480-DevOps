@@ -1,5 +1,5 @@
 [vyos]
-10.0.17.200 hostname=fw-blue1 mac=00:50:56:b9:ec:35 wan_ip=10.0.17.200 lan_ip=10.0.5.2 network=10.0.5.0/24 nameserver=10.0.17.4 gateway=10.0.17.2
+10.0.17.200 hostname=fw-blue1 mac=00:50:56:b9:ec:35 wan_ip=10.0.17.200 lan_ip=10.0.5.2 lan=10.0.5.0/24 nameserver=10.0.17.4 gateway=10.0.17.2
 
 [vyos:vars]
 ansible_python_interpreter=/usr/bin/python3
