@@ -1,4 +1,3 @@
-vyos@480-fw# show
  interfaces {
      ethernet eth0 {
          address {{ wan_ip }}/24
@@ -35,7 +34,7 @@ vyos@480-fw# show
          forwarding {
              allow-from {{ lan }}
              listen-address {{ lan_ip }}
-			 name-server {{ name_server }}
+			 name-server {{ nameserver }}
              system
          }
      }
