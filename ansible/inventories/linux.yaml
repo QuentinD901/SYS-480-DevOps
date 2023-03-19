@@ -1,0 +1,35 @@
+linux:
+  hosts:
+  children:
+    ubuntu:
+      hosts:
+        10.0.5.80:
+          hostname: ubuntu01
+          lan_ip: 10.0.5.30
+        10.0.5.81: 
+          hostname: ubuntu02
+          lan_ip: 10.0.5.31
+      vars:
+        device: enp3s0
+    rocky:
+      hosts:
+        10.0.5.75:
+          hostname: rocky01
+          lan_ip: 10.0.5.10
+        10.0.5.76:
+          hostname: rocky02
+          lan_ip: 10.0.5.11
+        10.0.5.77:
+          hostname: rocky03
+          lan_ip: 10.0.5.12
+      vars:
+        device: ens33
+    
+  
+  vars:
+    public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCwwCpiSZ6jUzNIl+8Zl8AzmmWc1BESG349yQD5bbobxO4WKVvkrbKktsaIb+OWLRJhxK0FWG5xUrXr2AfJMW5tytQRbEnvyZJnmny25g9g3lGrucFBPOUQfrVRX/j1CX16ok0z049m8BMCk51rNl/AyAk63jYzv6teIL/8TBKGx+LuRXeirNGhZUrFHlPHK/sXt/WIivieKGudLeGqUeyiX8UKWztmar791wTe/KUT8e8hwIVn4swdTDGNKFgJsN5F+wwXb0vB36A8RL7KRCd3LAC/wnp050BxtTMyWduG8ikLis6SuLNurc4pV7f8qS3BK1IgSiJpNyaOzds+eXAyt3hxSwAOp48aDG8npRM2aLECbMVxg/yuRh8rUlJEgEhO5kyNz60XMQ0w1y96IdshqtXBXS+yoHZ19OGJZrc6pZngcmwuda5BTzOHydbD2s+6tFQ0zt8hgqWU4fxlm8gj+M7I1O7czFs6aD2KjEDH5KxMYshOmMz9G3wPcdklQME= deployer@localhost.localdomain"
+    ansible_user: deployer
+    prefix: 24
+    gateway: 10.0.5.2
+    name_server: 10.0.5.5
+    domain: blue1.local
