@@ -1,0 +1,25 @@
+# This role installs Filebeat
+
+# Elastic  key
+- name: Elasticsearch Key
+  apt_key:
+   url: "https://packages.elastic.co/GPG-KEY-elasticsearch"
+   state: present
+
+# Elastc repo
+- name: Elasticsearch Repo
+  apt_repository:
+   repo: deb https://artifacts.elastic.co/packages/8.x/apt stable main
+   state: present
+   
+# Install Filebeat 
+- name: Install Filebeat
+  apt:
+   name: filebeat
+   update_cache: yes
+
+# Start Filebeat
+- name: Starting Filebeat
+  service:
+   name: filebeat
+   state: started

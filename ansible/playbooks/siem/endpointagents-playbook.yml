@@ -1,0 +1,8 @@
+# This playbook installs an ELK Stack 
+
+- hosts: siemagents
+  remote_user: deployer
+  become: yes
+  become_user: root
+  roles:
+    - rsyslog

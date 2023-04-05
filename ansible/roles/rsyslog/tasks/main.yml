@@ -1,0 +1,25 @@
+- name: Check for rsyslog file
+  stat:
+    path: /etc/rsyslog.conf
+  register: rsyslog_conf
+
+- name: Install rsyslog if not installed
+  apt:
+    name: rsyslog
+    state: present
+  when: rsyslog_conf.stat.exists == False
+
+
+- name: remove unwanted defaults
+  shell: rm -rf /etc/rsyslog.d/*
+
+- name: Create sys480.conf
+  shell: touch /etc/rsyslog.d/sys480.conf
+
+- name: Configure rsyslog to send logs to 10.0.5.30
+  lineinfile:
+    path: /etc/rsyslog.d/sys480.conf
+    line: "*.* @10.0.5.30:9200"
+
+- name: restart rsyslog
+  shell: systemctl restart rsyslog

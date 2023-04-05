@@ -1,0 +1,13 @@
+# This playbook installs an ELK Stack 
+
+- hosts: siemservers
+  remote_user: deployer
+  become: yes
+  become_user: root
+  roles:
+    - elasticsearch
+    - java
+    - kibana
+    - filebeat
+    - metricbeat
+    - hostname

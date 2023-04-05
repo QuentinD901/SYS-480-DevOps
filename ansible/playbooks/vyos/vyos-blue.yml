@@ -22,3 +22,4 @@
       - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} lease '86400'
       - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} range {{ shared_network }}-POOL start '10.0.5.75'
       - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} range {{ shared_network }}-POOL stop '10.0.5.125'
+      

@@ -1,0 +1,21 @@
+# This role updates the firewall rules
+
+- name: Allow traffic to Elasticsearch
+  command:
+    cmd: firewall-cmd --permanent --add-port=9200/tcp 
+  
+- name: Allow traffic to Kibana
+  command:
+    cmd: firewall-cmd --permanent --add-port=5601/tcp 
+  
+- name: Allow traffic to Logstash
+  command:
+    cmd: firewall-cmd --permanent --add-port=5044/tcp 
+  
+- name: Allow traffic to Beats input
+  command:
+    cmd: firewall-cmd --permanent --add-port=5044/tcp
+
+- name: Reload firewall
+  command:
+    cmd: firewall-cmd --reload

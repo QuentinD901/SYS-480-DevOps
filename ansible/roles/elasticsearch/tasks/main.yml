@@ -1,0 +1,40 @@
+# This role installs Elasticsearch
+
+# Elasticsearch apt key
+- name: Elasticsearch Key
+  apt_key:
+   url: "https://packages.elastic.co/GPG-KEY-elasticsearch"
+   state: present
+
+# Elasticsearch apt repo
+- name: Elasticsearch Repo
+  apt_repository:
+   repo: deb https://artifacts.elastic.co/packages/8.x/apt stable main
+   state: present
+
+# Elasticsearch
+- name: Install Elasticsearch
+  apt:
+   name: elasticsearch
+   update_cache: yes
+   
+# Elasticsearch config  
+- name: Allow Access
+  lineinfile:
+   destfile: /etc/elasticsearch/elasticsearch.yml
+   regexp: 'network.host:'
+   line: 'network.host: 0.0.0.0'
+ 
+# Elasticsearch port config 
+- name: Server Port 
+  lineinfile:
+   destfile: /etc/elasticsearch/elasticsearch.yml
+   regexp: 'http.port:'
+   line: 'http.port: 9200'
+ 
+# Start Elasticsearch
+- name: Start Elasticsearch
+  service:
+   name: elasticsearch
+   state: started
+    

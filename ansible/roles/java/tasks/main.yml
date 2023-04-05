@@ -1,0 +1,13 @@
+# This role installs Java 
+
+# Install Java
+- name: Install Java
+  apt:
+    name: openjdk-11-jdk
+    state: present
+
+# Start Java
+- name: Start Java service
+  service:
+    name: systemd-resolved
+    state: started

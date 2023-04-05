@@ -1,0 +1,32 @@
+# This role installs Kibana
+
+# Install Kibana 
+- name: Install Kibana 
+  apt:
+   name: kibana
+   update_cache: yes
+ 
+# Config
+- name: Allow Access
+  lineinfile:
+   destfile: /etc/kibana/kibana.yml
+   regexp: 'server.host:'
+   line: 'server.host: 0.0.0.0'
+
+- name: Define Server Port
+  lineinfile:
+   destfile: /etc/kibana/kibana.yml
+   regexp: 'server.port:'
+   line: 'server.port: 5601'
+    
+- name: Define Elasticsearch URL
+  lineinfile:
+   destfile: /etc/kibana/kibana.yml
+   regexp: 'elasticsearch.url:'
+   line: 'elasticsearch.url: "http://10.0.5.10:9200"'
+   
+# Start Kibana
+- name: Start Kibana
+  service:
+   name: kibana
+   state: started

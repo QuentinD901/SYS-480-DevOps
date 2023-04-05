@@ -3,27 +3,36 @@ linux:
   children:
     ubuntu:
       hosts:
-        10.0.5.80:
+        10.0.5.84:
           hostname: ubuntu01
           lan_ip: 10.0.5.30
-        10.0.5.81: 
+        10.0.5.85: 
           hostname: ubuntu02
           lan_ip: 10.0.5.31
       vars:
-        device: enp3s0
+        device: ens33
     rocky:
       hosts:
-        10.0.5.75:
-          hostname: rocky01
-          lan_ip: 10.0.5.10
-        10.0.5.76:
-          hostname: rocky02
-          lan_ip: 10.0.5.11
-        10.0.5.77:
-          hostname: rocky03
-          lan_ip: 10.0.5.12
+        10.0.5.82:
+          hostname: rocky04
+          lan_ip: 10.0.5.13
+        10.0.5.83:
+          hostname: rocky05
+          lan_ip: 10.0.5.14
+        10.0.5.86:
+          hostname: rocky06
+          lan_ip: 10.0.5.15
       vars:
         device: ens33
+    siemservers:
+      hosts:
+        10.0.5.30:
+          hostname: siem-01
+    siemagents:
+      hosts:
+ #       10.0.5.10:
+ #       10.0.5.11:
+        10.0.5.31:
     
   
   vars:
